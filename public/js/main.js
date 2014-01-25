@@ -8,6 +8,9 @@ var KEYCODE_Z = 90;
 var canvas;
 var stage;
 var background;
+var backgroundRed;
+var backgroundGreen;
+var backgroundBlue;
 var spritesImage;
 var spriteSheet;
 var characters;
@@ -114,7 +117,9 @@ function init() {
   socket.emit('playerConnect');
 
   // load background
-  background = new createjs.Bitmap("/images/colosseum.png");
+  backgroundRed = new createjs.Bitmap("/images/redGummyBear.png");
+  backgroundGreen = new createjs.Bitmap("/images/greenGummyBear.png");
+  backgroundBlue = new createjs.Bitmap("/images/blueGummyBear.png");
 
   // load sprite sheet
   spritesImage = new Image();
@@ -220,6 +225,8 @@ function startGame(data) {
   // clear arrays
   characters.length = 0;
   deadCharacterIds.length = 0;
+
+  background = backgroundRed;
 
   // strip stage and add background
   stage.removeAllChildren();

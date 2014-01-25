@@ -6,6 +6,8 @@ var character = function (options) {
   player.sprite = new createjs.BitmapAnimation(spriteSheet);
   player.sprite.x = options.x;
   player.sprite.y = options.y;
+  player.sprite.scaleX = 0.5;
+  player.sprite.scaleY = 0.5;
   player.updown = options.updown;
   player.leftright = options.leftright;
   player.facingLeftright = player.leftright;
@@ -47,23 +49,23 @@ var character = function (options) {
     //todo: fix to match new map bounds
 
     // set trap variable once a character enters the game area
-    if (!player.stageBoundTrap && (player.sprite.x < 470 && player.sprite.x > 30))
+    if (!player.stageBoundTrap && (player.sprite.x < 740 && player.sprite.x > 60))
       player.stageBoundTrap = true;
 
     // ensure character doesn't leave the game area if trap variable is set
     if (player.stageBoundTrap) {
-      if (player.sprite.x < 30)
-        player.sprite.x = 30;
-      else if (player.sprite.x > 470)
-        player.sprite.x = 470;
+      if (player.sprite.x < 60)
+        player.sprite.x = 60;
+      else if (player.sprite.x > 740)
+        player.sprite.x = 740;
     }
-    if (player.sprite.y < 200)
-      player.sprite.y = 200;
-    else if (player.sprite.y > 420)
-      player.sprite.y = 420;
+    if (player.sprite.y < 0)
+      player.sprite.y = 0;
+    else if (player.sprite.y > 320)
+      player.sprite.y = 320;
 
     // kill weird x-bound escapees
-    if (player.sprite.x > 560 || player.sprite.x < -60)
+    if (player.sprite.x > 760 || player.sprite.x < -60)
       player.dead = true;
 
     // fix remote character animations
@@ -194,6 +196,18 @@ var character = function (options) {
     player.updateAnimation();
 
     //todo switch background
+    switch (player.color){
+      case 'red':
+        background = backgroundRed;
+        break;
+      case 'green':
+        background = backgroundGreen;
+        break;
+      case 'blue':
+        background = backgroundBlue;
+        break;
+    }
+
     //todo switch wall display
   };
 
@@ -206,7 +220,8 @@ var character = function (options) {
       updown: player.updown,
       spritex: player.sprite.x,
       spritey: player.sprite.y,
-      justAttacked: player.justAttacked
+      justAttacked: player.justAttacked,
+      color: player.color
     });
 
     // set update time on local models
@@ -221,20 +236,21 @@ var character = function (options) {
     player.updown = 0.8 * characterData.updown;
     player.leftright = 0.8 * characterData.leftright;
     player.facingLeftright = characterData.facingLeftright;
+    player.color = characterData.color;
 
     // mark as updated
     player.lastUpdateTime = Date.now();
 
     // handle motion and attacks
-    if (characterData.justAttacked) {
-      // ensure that attack animation from remote characters complete
-      player.sprite.onAnimationEnd = function () {
-        player.localAttackAnimationComplete = true;
-      };
-      player.handleAttackOn('zombie');
-    }
-    else
-      player.updateAnimation();
+//    if (characterData.justAttacked) {
+//      // ensure that attack animation from remote characters complete
+//      player.sprite.onAnimationEnd = function () {
+//        player.localAttackAnimationComplete = true;
+//      };
+//      player.handleAttackOn('zombie');
+//    }
+//    else
+    player.updateAnimation();
   };
 
   // handle player death
