@@ -1,0 +1,16 @@
+{
+  "name": "azurelogic",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "jade": "*",
+    "less-middleware": "*",
+    "mongoose": "*",
+    "express.io": "*",
+    "node-uuid": "*",
+    "lodash": "*"
+  }
+}

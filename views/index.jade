@@ -1,0 +1,87 @@
+extends layout
+
+block scripts
+  //-script(src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js")
+  script(type="text/javascript",src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js")
+  //-script(type="text/javascript",src="/socket.io/socket.io.js")
+  script(type="text/javascript",src="//code.createjs.com/easeljs-0.6.0.min.js")
+  //-script(type="text/javascript",src="/js/easeljs-0.6.0.min.js")
+  script(type="text/javascript",src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.2.0/lodash.min.js")
+  //-script(type="text/javascript",src="/js/lodash.js")
+  script(type="text/javascript",src="//cdnjs.cloudflare.com/ajax/libs/knockout/2.2.0/knockout-min.js")
+  //-script(type="text/javascript",src="//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js")
+  //-script(type="text/javascript",src="/js/knockout-2.2.1.js")
+  script(type="text/javascript",src="/js/uuid.js")
+  script(type="text/javascript",src="/js/classes.js")
+  script(type="text/javascript",src="/js/main.js")
+
+
+block content
+  body(onload="init();")
+    #mainContainer
+      #headerContainer.centerText
+        h1 Retro Roman Zombie Apocalypse
+      #contentContainer.clearfix
+        #roomContainer.centerText(data-bind="visible: !gameStarted()")
+          h2 Click on a room below to join the action
+          #roomList(data-bind="foreach: rooms")
+            .room(data-bind="click: $root.joinRoom")
+              .roomId
+                span Room ID:
+                span(data-bind="text: roomId")
+              .playerCount
+                span # of players:
+                span(data-bind="text: playerCount")
+        #roomData(data-bind="visible: !gameStarted()")
+          #totalRooms
+            h2 Total # of rooms:&nbsp;
+              span(data-bind="text: totalRooms")
+          #availableRooms
+            h2 # of rooms available:&nbsp;
+              span(data-bind="text: rooms().length")
+          #playersInRooms
+            h2 # of players in game:&nbsp;
+              span(data-bind="text: playersInRooms")
+          br
+          h2 How to play:
+          h2 Arrow Keys: Move your gladiator
+          h2 Spacebar: ATTACK!!!
+          br
+          button(data-bind="click: $root.getRoomUpdate") Refresh Rooms
+        #gameContainer(data-bind="visible: gameStarted")
+          canvas#gameCanvas(width=500,height=500) no canvas support
+          #gameData
+            #healthStats(data-bind="visible: !dead()")
+              h2 Health:
+              h1(data-bind="text: health")
+            h1(data-bind="visible: dead") YOU DIED!
+            h2 Score:
+            h1(data-bind="text: points")
+            button(data-bind="click: returnToRoomList") Return to room list
+      #footerContainer.centerText
+        br
+        h2
+          span Built by Rob Ribeiro
+          br
+          span Twitter:&nbsp;
+          a(href="http://twitter.com/azurelogic") @azurelogic
+          br
+        h3
+        span Powered by:
+        br
+        a(href="http://www.createjs.com/#!/EaselJS") EaselJS
+        span &nbsp;&nbsp;
+        a(href="http://nodejs.org/") Node.js
+        span &nbsp;&nbsp;
+        a(href="http://expressjs.com/") Express
+        span &nbsp;&nbsp;
+        a(href="http://socket.io/") Socket.IO
+        br
+        a(href="http://express-io.org/") Express.io
+        span &nbsp;&nbsp;
+        a(href="http://lodash.com/") Lo-Dash
+        span &nbsp;&nbsp;
+        a(href="http://knockoutjs.com/") Knockout
+        span &nbsp;&nbsp;
+        a(href="https://github.com/broofa/node-uuid") node-uuid
+
