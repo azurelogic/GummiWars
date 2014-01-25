@@ -3,6 +3,7 @@ var KEYCODE_UP = 38;
 var KEYCODE_LEFT = 37;
 var KEYCODE_RIGHT = 39;
 var KEYCODE_DOWN = 40;
+var KEYCODE_Z = 90;
 
 var canvas;
 var stage;
@@ -25,6 +26,7 @@ var keyPressedUp;
 var keyPressedLeft;
 var keyPressedRight;
 var keyPressedSpace;
+var keyPressedZ;
 var viewModel;
 var sendLocalPlayerMotion;
 
@@ -147,50 +149,46 @@ function handlePlayerDied(data) {
 function handleImageLoad() {
   // data about the organization of the sprite sheet
   var spriteData = {
-    images: ["images/sprites.png"],
+    images: ["images/blueGummyBear.png","images/greenGummyBear.png","images/redGummyBear.png"],
     frames: [
-      [0, 0, 80, 80, 0, 40, 0],
-      [80, 0, 80, 80, 0, 40, 0],
-      [160, 0, 80, 80, 0, 40, 0],
-      [240, 0, 80, 80, 0, 40, 0],
-      [320, 0, 80, 80, 0, 40, 0],
-      [0, 80, 80, 80, 0, 40, 0],
-      [80, 80, 80, 80, 0, 40, 0],
-      [160, 80, 80, 80, 0, 40, 0],
-      [240, 80, 80, 80, 0, 40, 0],
-      [320, 80, 80, 80, 0, 40, 0],
-      [0, 160, 80, 80, 0, 40, 0],
-      [80, 160, 80, 80, 0, 40, 0],
-      [160, 160, 80, 80, 0, 40, 0],
-      [240, 160, 80, 80, 0, 40, 0],
-      [320, 160, 80, 80, 0, 40, 0],
-      [0, 240, 80, 80, 0, 40, 0],
-      [80, 240, 80, 80, 0, 40, 0],
-      [160, 240, 80, 80, 0, 40, 0],
-      [240, 240, 80, 80, 0, 40, 0],
-      [320, 240, 80, 80, 0, 40, 0],
-      [0, 320, 80, 80, 0, 40, 0],
-      [80, 320, 80, 80, 0, 40, 0],
-      [160, 320, 80, 80, 0, 40, 0],
-      [240, 320, 80, 80, 0, 40, 0],
-      [320, 320, 80, 80, 0, 40, 0]
+        [0,0,119,179,0,60,0],
+        [0,0,119,179,1,60,0],
+        [0,0,119,179,2,60,0]
+//      [0, 0, 80, 80, 0, 40, 0],
+//      [80, 0, 80, 80, 0, 40, 0],
+//      [160, 0, 80, 80, 0, 40, 0],
+//      [240, 0, 80, 80, 0, 40, 0],
+//      [320, 0, 80, 80, 0, 40, 0],
+//      [0, 80, 80, 80, 0, 40, 0],
+//      [80, 80, 80, 80, 0, 40, 0],
+//      [160, 80, 80, 80, 0, 40, 0],
+//      [240, 80, 80, 80, 0, 40, 0],
+//      [320, 80, 80, 80, 0, 40, 0],
+//      [0, 160, 80, 80, 0, 40, 0],
+//      [80, 160, 80, 80, 0, 40, 0],
+//      [160, 160, 80, 80, 0, 40, 0],
+//      [240, 160, 80, 80, 0, 40, 0],
+//      [320, 160, 80, 80, 0, 40, 0]
     ],
     animations: {
       bluestand: 0,
-      bluewalk: { frames: [1, 0, 2, 0], frequency: 6 },
-      blueattack: { frames: [0, 3, 4, 3], frequency: 6 },
-      greenstand: 5,
-      greenwalk: { frames: [6, 5, 7, 5], frequency: 6 },
-      greenattack: { frames: [5, 8, 9, 8], frequency: 6 },
-      redstand: 10,
-      redwalk: { frames: [11, 10, 12, 10], frequency: 6 },
-      redattack: { frames: [10, 13, 14, 13], frequency: 6 },
-      yellowstand: 15,
-      yellowwalk: { frames: [16, 15, 17, 15], frequency: 6 },
-      yellowattack: { frames: [15, 18, 19, 18], frequency: 6 },
-      zombiestand: 20,
-      zombiewalk: { frames: [21, 20, 22, 20], frequency: 10 },
-      zombieattack: { frames: [20, 23, 24, 23], frequency: 10 }
+      bluewalk: 0,
+      blueattack: 0,
+      greenstand: 1,
+      greenwalk: 1,
+      greenattack: 1,
+      redstand: 2,
+      redwalk: 2,
+      redattack: 2
+//      bluestand: 0,
+//      bluewalk: { frames: [1, 0, 2, 0], frequency: 6 },
+//      blueattack: { frames: [0, 3, 4, 3], frequency: 6 },
+//      greenstand: 5,
+//      greenwalk: { frames: [6, 5, 7, 5], frequency: 6 },
+//      greenattack: { frames: [5, 8, 9, 8], frequency: 6 },
+//      redstand: 10,
+//      redwalk: { frames: [11, 10, 12, 10], frequency: 6 },
+//      redattack: { frames: [10, 13, 14, 13], frequency: 6 }
     }
   };
 
@@ -272,6 +270,10 @@ function tick() {
   // this makes the game logic run independent of frame rate
   var deltaTime = now - lastTime;
 
+  //todo add collision detection
+  //part 1: did something hit me
+  //part 2: did one of my bullets hit something and go away
+
   // move all of the characters
   for (var i = 0; i < characters.length; i++)
     if (characters[i])
@@ -290,13 +292,13 @@ function tick() {
     stage.addChild(sortedCharacters[i].sprite);
 
   // determine if any local models attacked
-  var localModelAttacked = _.any(characters, function (character) {
-    return character.justAttacked && character.id == localPlayerId;
+  var localModelDidSomethingImportant = _.any(characters, function (character) {
+    return (character.justSwitchedColor || character.justAttacked) && character.id == localPlayerId;
   });
 
   // send game data if motion occurred, any local character attacked,
   // or just a heartbeat every 500 milliseconds
-  if (sendLocalPlayerMotion || localModelAttacked || now - lastHeartbeatTime > 500) {
+  if (sendLocalPlayerMotion || localModelDidSomethingImportant || now - lastHeartbeatTime > 500) {
     sendLocalPlayerMotion = false;
     sendGameDataToServer();
     lastHeartbeatTime = now;
@@ -372,6 +374,14 @@ function handleKeyDown(e) {
         }
         nonGameKeyPressed = false;
         break;
+      case KEYCODE_Z:
+        if (!keyPressedZ) {
+          player.justSwitchedColor = true;
+          keyPressedZ = true;
+          player.switchToNextColor();
+        }
+        nonGameKeyPressed = false;
+        break;
     }
     // return necessary to tell the browser whether it should handle the
     // key separately; don't want game keys being passed back to the
@@ -408,6 +418,10 @@ function handleKeyUp(e) {
         break;
       case KEYCODE_SPACE:
         keyPressedSpace = false;
+        nonGameKeyPressed = false;
+        break;
+      case KEYCODE_Z:
+        keyPressedZ = false;
         nonGameKeyPressed = false;
         break;
     }

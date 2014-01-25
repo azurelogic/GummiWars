@@ -23,7 +23,6 @@ var character = function (options) {
   player.lastUpdateTime = Date.now();
   player.dead = false;
 
-
 // updates character animation based on current direction components
   player.updateAnimation = function () {
     if ((player.updown != 0 || player.leftright != 0))
@@ -182,6 +181,20 @@ var character = function (options) {
     // update health on viewmodel for knockout if local player was damaged
     if (player.id == localPlayerId)
       viewModel.health(player.health);
+  };
+
+  player.switchToNextColor = function () {
+    var indexOfCurrentColor = _.findIndex(colors, function (color) {
+      return player.color = color;
+    });
+
+    player.color = colors[(indexOfCurrentColor + 1) % colors.length];
+
+    //switch player sprite
+    player.updateAnimation();
+
+    //todo switch background
+    //todo switch wall display
   };
 
   // appends player data to message
