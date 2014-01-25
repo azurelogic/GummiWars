@@ -146,27 +146,26 @@ var generatePlayer = function (options) {
   player.detectCollisions = function () {
     //todo change this to find other characters' projectiles
     // find the local models of the enemy type
-    var opposingForces = []; //_.where(characters, {characterType: enemyType});
+    //var opposingForces = []; //_.where(characters, {characterType: enemyType});
 
     // perform collision detection with all opposing forces
-    for (var i = 0; i < opposingForces.length; i++) {
+    for (var i = 0; i < projectiles.length; i++) {
       // don't bother with detailed collisions if out of damage radius range
-      if (opposingForces[i].sprite.x > player.sprite.x + player.damageRadius ||
-          opposingForces[i].sprite.x < player.sprite.x - player.damageRadius ||
-          opposingForces[i].sprite.y > player.sprite.y + player.damageRadius ||
-          opposingForces[i].sprite.y < player.sprite.y - player.damageRadius)
+      if (projectiles[i].x > player.sprite.x + player.damageRadius ||
+          projectiles[i].x < player.sprite.x - player.damageRadius ||
+          projectiles[i].y > player.sprite.y + player.damageRadius ||
+          projectiles[i].y < player.sprite.y - player.damageRadius)
         continue;
 
       // calculate x and y distances
-      var x = player.sprite.x - opposingForces[i].sprite.x;
-      var y = player.sprite.y - opposingForces[i].sprite.y;
+      var x = player.sprite.x - projectiles[i].x;
+      var y = player.sprite.y - projectiles[i].y;
 
       // deliver damage if within damage radius and in the correct direction;
       // this is essentially a semicircle damage area in front of the character
       // with a little wrap around the back
-      if (x * x + y * y <= player.damageRadiusSquared &&
-          (opposingForces[i].sprite.x - player.sprite.x) * player.facingLeftright >= -10)
-        opposingForces[i].takeDamage(player.damageRating, this);
+      if (x * x + y * y <= player.damageRadiusSquared)
+        player.takeDamage(30);
     }
   };
 
@@ -402,4 +401,3 @@ var generateProjectile = function (options) {
 //  deadCharacterIds.push({id: this.id, time: Date.now()});
 //  this.dead = true;
 //};
-// test comment

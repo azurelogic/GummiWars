@@ -393,7 +393,6 @@ function handleKeyDown(e) {
         if (!keyPressedSpace) {
           player.justAttacked = true;
           keyPressedSpace = true;
-          //todo this needs to fire projectiles now
           player.fireProjectile();
         }
         nonGameKeyPressed = false;
