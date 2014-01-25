@@ -152,8 +152,8 @@ var character = function (options) {
 
   // stop character from moving and start playing attack animation
   player.startAttackMotion = function () {
-    player.updown = 0;
-    player.leftright = 0;
+    //player.updown = 0;
+    //player.leftright = 0;
     player.sprite.gotoAndPlay(player.getAnimationNameFor('attack'));
   };
 
@@ -185,7 +185,7 @@ var character = function (options) {
 
   player.switchToNextColor = function () {
     var indexOfCurrentColor = _.findIndex(colors, function (color) {
-      return player.color = color;
+      return player.color == color;
     });
 
     player.color = colors[(indexOfCurrentColor + 1) % colors.length];
