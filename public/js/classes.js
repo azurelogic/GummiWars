@@ -1,5 +1,5 @@
 // Character constructor
-var character = function (options) {
+var generatePlayer = function (options) {
   // setup Character common properties from options object as needed
   var player = {};
   player.id = options.id;
@@ -24,6 +24,11 @@ var character = function (options) {
   player.localAttackAnimationComplete = false;
   player.lastUpdateTime = Date.now();
   player.dead = false;
+
+  player.setSpriteScale = function (newValue) {
+    player.sprite.scaleX = newValue;
+    player.sprite.scaleY = newValue;
+  };
 
 // updates character animation based on current direction components
   player.updateAnimation = function () {
@@ -81,10 +86,10 @@ var character = function (options) {
     return player.color + animationType;
   };
 
- // ----- motion handling function section -----
- // these functions set the direction of motion, direction the
- // character faces, and the current animation based on which
- // key is being pressed or released
+  // ----- motion handling function section -----
+  // these functions set the direction of motion, direction the
+  // character faces, and the current animation based on which
+  // key is being pressed or released
   player.startLeftMotion = function () {
     player.leftright = -1;
     player.facingLeftright = player.leftright;
@@ -121,15 +126,28 @@ var character = function (options) {
   };
 
   // handles collision detection and damage delivery to opposing character type
-  player.handleAttackOn = function () {
+  player.fireProjectile = function () {
     // start the attack animation
-    player.startAttackMotion();
+    player.sprite.gotoAndPlay(player.getAnimationNameFor('attack'));
 
+    projectiles.push(generateProjectile({
+      id: uuid.v4(),
+      ownerId: localPlayerId,
+      x: player.sprite.x,
+      y: player.sprite.y,
+      updown: player.updown,
+      leftright: player.leftright,
+      color: player.color,
+      justCreated: true
+    }));
+
+  };
+
+  player.detectCollisions = function () {
     //todo change this to find other characters' projectiles
     // find the local models of the enemy type
     var opposingForces = []; //_.where(characters, {characterType: enemyType});
 
-    //this nee
     // perform collision detection with all opposing forces
     for (var i = 0; i < opposingForces.length; i++) {
       // don't bother with detailed collisions if out of damage radius range
@@ -150,13 +168,6 @@ var character = function (options) {
           (opposingForces[i].sprite.x - player.sprite.x) * player.facingLeftright >= -10)
         opposingForces[i].takeDamage(player.damageRating, this);
     }
-  };
-
-  // stop character from moving and start playing attack animation
-  player.startAttackMotion = function () {
-    //player.updown = 0;
-    //player.leftright = 0;
-    player.sprite.gotoAndPlay(player.getAnimationNameFor('attack'));
   };
 
   // handle taking damage, marking characters as dead, and
@@ -195,8 +206,8 @@ var character = function (options) {
     //switch player sprite
     player.updateAnimation();
 
-    //todo switch background
-    switch (player.color){
+    //switch background
+    switch (player.color) {
       case 'red':
         background = backgroundRed;
         break;
@@ -247,7 +258,7 @@ var character = function (options) {
 //      player.sprite.onAnimationEnd = function () {
 //        player.localAttackAnimationComplete = true;
 //      };
-//      player.handleAttackOn('zombie');
+//      player.fireProjectile('zombie');
 //    }
 //    else
     player.updateAnimation();
@@ -287,8 +298,87 @@ var character = function (options) {
   // start animation standing
   player.sprite.gotoAndPlay(player.getAnimationNameFor('stand'));
 
-
   return player;
+};
+
+var generateProjectile = function (options) {
+  // setup projectile common properties from options object as needed
+  var projectile = {};
+  projectile.id = options.id;
+  projectile.ownerId = options.ownerId;
+  projectile.sprite = new createjs.BitmapAnimation(spriteSheet);
+  projectile.sprite.x = options.x;
+  projectile.sprite.y = options.y;
+  projectile.sprite.scaleX = 0.75;
+  projectile.sprite.scaleY = 0.75;
+  projectile.updown = options.updown;
+  projectile.leftright = options.leftright;
+  projectile.color = options.color;
+  //projectile.characterType = options.characterType;
+  projectile.velocityFactor = .6;
+  projectile.damageRadius = 60;
+  projectile.damageRadiusSquared = projectile.damageRadius * projectile.damageRadius;
+  projectile.damageRating = 10;
+  projectile.stageBoundTrap = false;
+  projectile.lastUpdateTime = Date.now();
+  projectile.destroyed = false;
+  projectile.justCreated = options.justCreated;
+
+  // handles character movement based on current direction vector
+  projectile.move = function (deltaTime) {
+    // vertical/horizontal motiion
+    if (projectile.updown == 0 || projectile.leftright == 0) {
+      projectile.sprite.x += projectile.leftright * deltaTime * projectile.velocityFactor;
+      projectile.sprite.y += projectile.updown * deltaTime * projectile.velocityFactor;
+    }
+    // diagonal motion
+    else {
+      projectile.sprite.x += projectile.leftright * deltaTime * projectile.velocityFactor * 0.70711;
+      projectile.sprite.y += projectile.updown * deltaTime * projectile.velocityFactor * 0.70711;
+    }
+
+    //todo: fix to match new map bounds
+
+    // set trap variable once a character enters the game area
+    if (!projectile.stageBoundTrap && (projectile.sprite.x < 640 && projectile.sprite.x > 60))
+      projectile.stageBoundTrap = true;
+
+    // ensure character doesn't leave the game area if trap variable is set
+    if (projectile.stageBoundTrap) {
+      if (projectile.sprite.x < 60)
+        projectile.sprite.x = 60;
+      else if (projectile.sprite.x > 640)
+        projectile.sprite.x = 640;
+    }
+    if (projectile.sprite.y < 0)
+      projectile.sprite.y = 0;
+    else if (projectile.sprite.y > 320)
+      projectile.sprite.y = 320;
+
+    // kill weird x-bound escapees
+    if (projectile.sprite.x > 760 || projectile.sprite.x < -60)
+      projectile.destroyed = true;
+  };
+
+  projectile.appendDataToMessage = function (data) {
+    data.projectiles.push({
+      id: projectile.id,
+      ownerId: projectile.ownerId,
+      leftright: projectile.leftright,
+      updown: projectile.updown,
+      spritex: projectile.sprite.x,
+      spritey: projectile.sprite.y,
+      color: projectile.color
+    });
+  };
+
+  // add sprite to the stage
+  stage.addChild(projectile.sprite);
+  stage.update();
+
+  projectile.sprite.gotoAndPlay(projectile.color + 'projectile');
+
+  return projectile;
 };
 
 

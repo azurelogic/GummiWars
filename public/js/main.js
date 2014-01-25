@@ -14,6 +14,7 @@ var backgroundBlue;
 var spritesImage;
 var spriteSheet;
 var characters;
+var projectiles;
 var deadCharacterIds;
 var colors;
 var socket;
@@ -41,6 +42,7 @@ function init() {
 
   // initialize arrays
   characters = [];
+  projectiles = [];
   deadCharacterIds = [];
 
   // setup the viewmodel for knockout
@@ -154,11 +156,15 @@ function handlePlayerDied(data) {
 function handleImageLoad() {
   // data about the organization of the sprite sheet
   var spriteData = {
-    images: ["images/blueGummyBear.png","images/greenGummyBear.png","images/redGummyBear.png"],
+    images: ["images/blueGummyBear.png","images/greenGummyBear.png","images/redGummyBear.png",
+      "images/blueGummieProjectile.png","images/greenGummieProjectile.png","images/redGummieProjectile.png"],
     frames: [
         [0,0,119,179,0,60,0],
         [0,0,119,179,1,60,0],
-        [0,0,119,179,2,60,0]
+        [0,0,119,179,2,60,0],
+        [0,0,38,33,3,19,0],
+        [0,0,38,33,4,19,0],
+        [0,0,38,33,5,19,0]
 //      [0, 0, 80, 80, 0, 40, 0],
 //      [80, 0, 80, 80, 0, 40, 0],
 //      [160, 0, 80, 80, 0, 40, 0],
@@ -184,7 +190,11 @@ function handleImageLoad() {
       greenattack: 1,
       redstand: 2,
       redwalk: 2,
-      redattack: 2
+      redattack: 2,
+      blueprojectile: 3,
+      greenprojectile: 4,
+      redprojectile: 5
+
 //      bluestand: 0,
 //      bluewalk: { frames: [1, 0, 2, 0], frequency: 6 },
 //      blueattack: { frames: [0, 3, 4, 3], frequency: 6 },
@@ -225,6 +235,7 @@ function startGame(data) {
   // clear arrays
   characters.length = 0;
   deadCharacterIds.length = 0;
+  projectiles.length = 0;
 
   background = backgroundRed;
 
@@ -286,8 +297,14 @@ function tick() {
     if (characters[i])
       characters[i].move(deltaTime);
 
+  // move all of the projectiles
+  for (var i = 0; i < projectiles.length; i++)
+    if (projectiles[i])
+      projectiles[i].move(deltaTime);
+
   // sort depth layers by reinsertion based on y value
-  var sortedCharacters = _.sortBy(characters, function (character) {
+  var combinedArray = characters.concat(projectiles);
+  var sortedSprites = _.sortBy(combinedArray, function (character) {
     return character.sprite.y;
   });
   // strip the stage
@@ -295,8 +312,8 @@ function tick() {
   // reinsert the stage
   stage.addChild(background);
   // reinsert the characters in sorted order
-  for (var i = 0; i < sortedCharacters.length; i++)
-    stage.addChild(sortedCharacters[i].sprite);
+  for (var i = 0; i < sortedSprites.length; i++)
+    stage.addChild(sortedSprites[i].sprite);
 
   // determine if any local models attacked
   var localModelDidSomethingImportant = _.any(characters, function (character) {
@@ -377,7 +394,7 @@ function handleKeyDown(e) {
           player.justAttacked = true;
           keyPressedSpace = true;
           //todo this needs to fire projectiles now
-          player.handleAttackOn('zombie');
+          player.fireProjectile();
         }
         nonGameKeyPressed = false;
         break;
@@ -471,6 +488,12 @@ function sendGameDataToServer() {
   if (player)
     player.appendDataToMessage(data);
 
+  data.projectiles = [];
+
+  var newProjectiles = _.filter(projectiles, {justCreated: true, ownerId: localPlayerId});
+  for (var i = 0; i < newProjectiles.length; i++)
+    newProjectiles[i].appendDataToMessage(data);
+
   //todo need to pack score data on messages
 
   // ship data to the server
@@ -492,6 +515,16 @@ function handleGameDataReceivedFromServer(data) {
   else if (playerData && !_.any(deadCharacterIds, {id: data.playerId}))
     addNewPlayer(playerData);
 
+  // extract models of remotely owned enemies from data message
+  var projectileDataList = _.where(data.projectiles, {ownerId: data.playerId});
+  // iterate over zombies being updated
+  for (var i = 0; i < projectileDataList.length; i++) {
+    // extract specific remote zombie data from data message
+    var projectileData = _.find(data.projectiles, {id: projectileDataList[i].id});
+    // when zombie does not exist and was not recently killed, add them
+    if (projectileData && !_.any(deadCharacterIds, {id: projectileDataList[i].id}))
+      addNewProjectile(projectileData);
+  }
 
   //todo need to unpack score data
 }
@@ -499,7 +532,7 @@ function handleGameDataReceivedFromServer(data) {
 // create a new local model for a player based on options object
 function addNewPlayer(options) {
   // add the new player to the characters array
-  characters.push(character({
+  characters.push(generatePlayer({
     id: options.id,
     x: options.spritex,
     y: options.spritey,
@@ -509,6 +542,20 @@ function addNewPlayer(options) {
     color: options.color,
     characterType: 'player',
     health: 100
+  }));
+}
+
+// create a new local model for a projectile based on options object
+function addNewProjectile(options) {
+  // add the new player to the characters array
+  projectiles.push(generateProjectile({
+    id: options.id,
+    ownerId: options.ownerId,
+    x: options.spritex,
+    y: options.spritey,
+    updown: options.updown,
+    leftright: options.leftright,
+    color: options.color
   }));
 }
 //
