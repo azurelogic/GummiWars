@@ -33,6 +33,7 @@ var keyPressedSpace;
 var keyPressedZ;
 var viewModel;
 var sendLocalPlayerMotion;
+var lastKeyUpTime;
 
 // initialize the whole game site
 function init() {
@@ -223,6 +224,7 @@ function startGame(data) {
   lastEnemyTime = 0;
   lastDeadCharacterPurgeTime = 0;
   enemyInterval = 1000;
+  lastKeyUpTime = 0;
 
   // set key press flags to false
   keyPressedDown = false;
@@ -421,26 +423,40 @@ function handleKeyDown(e) {
 function handleKeyUp(e) {
   // use common key handling code with custom switch callback
   return handleKeySignals(e, function (e, player) {
+    if (e.keyCode == KEYCODE_DOWN || e.keyCode == KEYCODE_LEFT ||
+            e.keyCode == KEYCODE_RIGHT || e.keyCode == KEYCODE_UP)
+    {
+      if (Date.now() - lastKeyUpTime > 150){
+        player.lastLeftright = 0;
+        player.lastUpdown = 0;
+      }
+      lastKeyUpTime = Date.now();
+    }
+
     var nonGameKeyPressed = true;
     switch (e.keyCode) {
       case KEYCODE_LEFT:
         keyPressedLeft = false;
+        player.lastLeftright = -1;
         player.stopLeftRightMotion();
         nonGameKeyPressed = false;
         break;
       case KEYCODE_RIGHT:
         keyPressedRight = false;
+        player.lastLeftright = 1;
         player.stopLeftRightMotion();
         nonGameKeyPressed = false;
         break;
       case KEYCODE_DOWN:
         keyPressedDown = false;
+        player.lastUpdown = 1;
         player.stopUpDownMotion();
         nonGameKeyPressed = false;
         break;
       case KEYCODE_UP:
         keyPressedUp = false;
         player.stopUpDownMotion();
+        player.lastUpdown = -1;
         nonGameKeyPressed = false;
         break;
       case KEYCODE_SPACE:
@@ -452,6 +468,8 @@ function handleKeyUp(e) {
         nonGameKeyPressed = false;
         break;
     }
+
+
     // return necessary to tell the browser whether it should handle the
     // key separately; don't want game keys being passed back to the
     // browser

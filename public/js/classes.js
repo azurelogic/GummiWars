@@ -23,6 +23,8 @@ var generatePlayer = function (options) {
   player.localAttackAnimationComplete = false;
   player.lastUpdateTime = Date.now();
   player.dead = false;
+  player.lastUpdown = 0;
+  player.lastLeftright = 1;
 
   player.setSpriteScale = function (newValue) {
     player.sprite.scaleX = newValue;
@@ -129,13 +131,24 @@ var generatePlayer = function (options) {
     // start the attack animation
     player.sprite.gotoAndPlay(player.getAnimationNameFor('attack'));
 
+    var updown, leftright;
+
+    if (player.updown == 0 && player.leftright == 0) {
+      updown = player.lastUpdown;
+      leftright = player.lastLeftright;
+    } else {
+      updown = player.updown;
+      leftright = player.leftright;
+    }
+
+
     projectiles.push(generateProjectile({
       id: uuid.v4(),
       ownerId: localPlayerId,
       x: player.sprite.x,
       y: player.sprite.y,
-      updown: player.updown,
-      leftright: player.leftright,
+      updown: updown,
+      leftright: leftright,
       color: player.color,
       justCreated: true
     }));
@@ -152,7 +165,7 @@ var generatePlayer = function (options) {
     var dangerColor = colors[(indexOfCurrentColor + 1) % colors.length];
 
     var dangerousProjectiles = _.where(projectiles, function (projectile) {
-      return projectile.color == dangerColor && projectile.ownerId != localPlayerId;
+      return projectile.color == dangerColor;
     });
 
     // perform collision detection with all dangerous projectiles
@@ -172,7 +185,8 @@ var generatePlayer = function (options) {
       if (x * x + y * y <= player.damageRadiusSquared)
       //todo change this to do something else
       {
-        player.takeDamage(20);
+        if (player.id == localPlayerId)
+          player.takeDamage(20);
         dangerousProjectiles[i].removeFromActiveProjectiles();
       }
     }
