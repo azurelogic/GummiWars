@@ -44,8 +44,12 @@ block content
               span(data-bind="text: playersInRooms")
           br
           h2 How to play:
-          h2 Arrow Keys: Move your gladiator
+          h2 Arrow Keys: Move your gummy
           h2 Spacebar: ATTACK!!!
+          h2 Z: Change color
+          h2 Red hurts Blue
+          h2 Blue hurts Green
+          h2 Green hurts Red
           br
           button.btn.btn-primary(data-bind="click: $root.getRoomUpdate") Refresh Rooms
         #gameContainer(data-bind="visible: gameStarted")
@@ -55,13 +59,21 @@ block content
               h2 Health:
               h1(data-bind="text: health")
             h1(data-bind="visible: dead") YOU DIED!
+            br
+            h2 How to play:
+            h2 Arrow Keys: Move your gummy
+            h2 Spacebar: ATTACK!!!
+            h2 Z: Change color
+            h2 Red hurts Blue
+            h2 Blue hurts Green
+            h2 Green hurts Red
             //h2 Score:
             //h1(data-bind="text: points")
             button.btn.btn-warning(data-bind="click: returnToRoomList") Return to room list
       #footerContainer.centerText
         br
         h2
-          div Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch
+          div Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch, Andrew Barker
           br
           span Rob on Twitter:&nbsp;
           a(href="http://twitter.com/azurelogic") @azurelogic
