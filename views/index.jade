@@ -25,12 +25,12 @@ block content
         #roomContainer.centerText(data-bind="visible: !gameStarted()")
           h2 Click on a room below to join the action
           #roomList(data-bind="foreach: rooms")
-            .room(data-bind="click: $root.joinRoom")
+            button.btn.btn-lg.btn-success.room(data-bind="click: $root.joinRoom")
               .roomId
                 span Room ID:
                 span(data-bind="text: roomId")
               .playerCount
-                span # of players:
+                span # of players: 
                 span(data-bind="text: playerCount")
         #roomData(data-bind="visible: !gameStarted()")
           #totalRooms
@@ -47,7 +47,7 @@ block content
           h2 Arrow Keys: Move your gladiator
           h2 Spacebar: ATTACK!!!
           br
-          button(data-bind="click: $root.getRoomUpdate") Refresh Rooms
+          button.btn.btn-primary(data-bind="click: $root.getRoomUpdate") Refresh Rooms
         #gameContainer(data-bind="visible: gameStarted")
           canvas#gameCanvas(width=700,height=500) no canvas support
           #gameData
@@ -57,7 +57,7 @@ block content
             h1(data-bind="visible: dead") YOU DIED!
             h2 Score:
             h1(data-bind="text: points")
-            button(data-bind="click: returnToRoomList") Return to room list
+            button.btn.btn-warning(data-bind="click: returnToRoomList") Return to room list
       #footerContainer.centerText
         br
         h2

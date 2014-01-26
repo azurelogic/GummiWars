@@ -158,14 +158,22 @@ function handleImageLoad() {
   // data about the organization of the sprite sheet
   var spriteData = {
     images: ["images/blueGummyBear.png","images/greenGummyBear.png","images/redGummyBear.png",
-      "images/blueGummieProjectile.png","images/greenGummieProjectile.png","images/redGummieProjectile.png"],
+      "images/blueGummieProjectile.png","images/greenGummieProjectile.png","images/redGummieProjectile.png",
+    "images/b1.png", "images/b2.png", "images/g1.png", "images/g2.png", "images/r1.png", "images/r2.png"],
     frames: [
-        [0,0,119,179,0,60,90],
-        [0,0,119,179,1,60,90],
-        [0,0,119,179,2,60,90],
-        [0,0,38,33,3,19,17],
-        [0,0,38,33,4,19,17],
-        [0,0,38,33,5,19,17]
+        [0,0,119,179,0,60,90], // 0 = blue standing
+        [0,0,119,179,1,60,90], // 1 = green standing
+        [0,0,119,179,2,60,90], // 2 = red standing
+        [0,0,38,33,3,19,17], // 3 = blue projectile
+        [0,0,38,33,4,19,17], // 4 =  green projectile
+        [0,0,38,33,5,19,17], // 5 = red projectile
+        [0,0,119,179,6,60,90], // 6 = blue walk 1
+        [0,0,119,179,7,60,90], // 7 = blue walk 2
+        [0,0,119,179,8,60,90], // 8 = green walk 1
+        [0,0,119,179,9,60,90], // 9 = green walk 2
+        [0,0,119,179,10,60,90], // 10 = red walk 1
+        [0,0,119,179,11,60,90], // 11 = red walk 2
+
 //      [0, 0, 80, 80, 0, 40, 0],
 //      [80, 0, 80, 80, 0, 40, 0],
 //      [160, 0, 80, 80, 0, 40, 0],
@@ -184,27 +192,21 @@ function handleImageLoad() {
     ],
     animations: {
       bluestand: 0,
-      bluewalk: 0,
+      //bluewalk: 0,
       blueattack: 0,
       greenstand: 1,
-      greenwalk: 1,
+//      greenwalk: 1,
       greenattack: 1,
       redstand: 2,
-      redwalk: 2,
+//      redwalk: 2,
       redattack: 2,
       blueprojectile: 3,
       greenprojectile: 4,
-      redprojectile: 5
+      redprojectile: 5,
 
-//      bluestand: 0,
-//      bluewalk: { frames: [1, 0, 2, 0], frequency: 6 },
-//      blueattack: { frames: [0, 3, 4, 3], frequency: 6 },
-//      greenstand: 5,
-//      greenwalk: { frames: [6, 5, 7, 5], frequency: 6 },
-//      greenattack: { frames: [5, 8, 9, 8], frequency: 6 },
-//      redstand: 10,
-//      redwalk: { frames: [11, 10, 12, 10], frequency: 6 },
-//      redattack: { frames: [10, 13, 14, 13], frequency: 6 }
+      bluewalk: { frames: [6, 0, 7, 0], frequency: 8 },
+      greenwalk: { frames: [8, 1, 9, 1], frequency: 8 },
+      redwalk: { frames: [10, 2, 11, 2], frequency: 8 }
     }
   };
 
