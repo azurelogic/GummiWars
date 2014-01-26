@@ -278,7 +278,7 @@ var generatePlayer = function (options) {
     }
 
     // release the color being used by the player
-    _.find(colors, {color: player.color}).unused = true;
+    //_.find(colors, {color: player.color}).unused = true;
   };
 
 
@@ -345,14 +345,14 @@ var generateProjectile = function (options) {
     // ensure character doesn't leave the game area if trap variable is set
     if (projectile.stageBoundTrap) {
       if (projectile.sprite.x < 60)
-        projectile.sprite.x = 60;
+        projectile.destroyed = true;
       else if (projectile.sprite.x > 640)
-        projectile.sprite.x = 640;
+        projectile.destroyed = true;
     }
     if (projectile.sprite.y < 0)
-      projectile.sprite.y = 0;
+      projectile.destroyed = true;
     else if (projectile.sprite.y > 320)
-      projectile.sprite.y = 320;
+      projectile.destroyed = true;
 
     // kill weird x-bound escapees
     if (projectile.sprite.x > 760 || projectile.sprite.x < -60)

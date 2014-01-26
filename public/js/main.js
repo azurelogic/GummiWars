@@ -338,9 +338,10 @@ function tick() {
       characters[i].die();
   }
 
-  // strip the dead from characters array;
+  // strip the dead from characters and projectiles arrays;
   // sprite will not be reinserted to stage during sorting on next tick
   characters = _.where(characters, {dead: false});
+  projectiles = _.where(projectiles, {destroyed: false});
 
   // purge dead characters after they have been dead more than 10 seconds
   if (now - lastDeadCharacterPurgeTime > 3001) {
