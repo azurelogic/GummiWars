@@ -186,7 +186,7 @@ var generatePlayer = function (options) {
       //todo change this to do something else
       {
         if (player.id == localPlayerId)
-          player.takeDamage(20);
+          player.takeDamage(10);
         dangerousProjectiles[i].removeFromActiveProjectiles();
       }
     }
@@ -418,38 +418,49 @@ var generateWall = function (options) {
   var direction;
 
   wall.color = options.color;
+  wall.sprites = [];
 
   if (options.top && options.bottom && options.x) {
     wall.top = options.top;
     wall.bottom = options.bottom;
     wall.left = options.x;
     wall.right = options.x + 25;
-    direction = 'vertical';
+    for (var i = 0; i < (options.bottom - options.top) / 25; i++) {
+      var wallPiece = {};
+      wallPiece.sprite = new createjs.BitmapAnimation(spriteSheet);
+
+      wallPiece.sprite.x = wall.left;
+      wallPiece.sprite.y = wall.top + i * 25;
+
+      // add sprite to the stage
+      stage.addChild(wallPiece.sprite);
+      stage.update();
+
+      wallPiece.sprite.gotoAndPlay(wall.color + 'wall');
+
+      wall.sprites.push(wallPiece);
+    }
   }
   else if (options.left && options.right && options.y) {
     wall.top = options.y;
     wall.bottom = options.y + 25;
     wall.left = options.left;
     wall.right = options.right;
-    direction = 'horizontal';
-  }
+    for (var i = 0; i < (options.right - options.left) / 25; i++) {
+      var wallPiece = {};
+      wallPiece.sprite = new createjs.BitmapAnimation(spriteSheet);
 
-  wall.sprites = [];
+      wallPiece.sprite.x = wall.left + i * 25;
+      wallPiece.sprite.y = wall.top;
 
-  for (var i = 0; i < (options.bottom - options.top) / 25; i++) {
-    var wallPiece = {};
-    wallPiece.sprite = new createjs.BitmapAnimation(spriteSheet);
+      // add sprite to the stage
+      stage.addChild(wallPiece.sprite);
+      stage.update();
 
-    wallPiece.sprite.x = wall.left;
-    wallPiece.sprite.y = wall.top + i * 25;
+      wallPiece.sprite.gotoAndPlay(wall.color + 'wall');
 
-    // add sprite to the stage
-    stage.addChild(wallPiece.sprite);
-    stage.update();
-
-    wallPiece.sprite.gotoAndPlay(wall.color + 'wall');
-
-    wall.sprites.push(wallPiece);
+      wall.sprites.push(wallPiece);
+    }
   }
 
   return wall;

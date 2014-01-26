@@ -185,9 +185,9 @@ function handleImageLoad() {
         [0,0,119,179,9,60,90], // 9 = green walk 2
         [0,0,119,179,10,60,90], // 10 = red walk 1
         [0,0,119,179,11,60,90], // 11 = red walk 2
-        [0,0,25,25,12,0,0], // 12 = red wall
-        [0,0,25,25,13,0,0], // 13 = green wall
-        [0,0,25,25,14,0,0], // 14 = blue wall
+        [0,0,25,25,12,0,-25], // 12 = red wall
+        [0,0,25,25,13,0,-25], // 13 = green wall
+        [0,0,25,25,14,0,-25], // 14 = blue wall
     ],
     animations: {
       bluestand: 0,
@@ -278,35 +278,35 @@ function startGame(data) {
     generateWall({
       left:200,
       right:500,
-      y:150,
+      y:50,
       color:'red'
     }),
     generateWall({
       left:200,
       right:500,
-      y:350,
+      y:375,
       color:'red'
     }),
     generateWall({
       left:250,
       right:300,
-      y:237,
+      y:212,
       color:'blue'
     }),
     generateWall({
       left:400,
       right:450,
-      y:237,
+      y:212,
       color:'blue'
     }),
     generateWall({
-      top:200,
+      top:150,
       bottom:300,
-      x:150,
+      x:125,
       color:'blue'
     }),
     generateWall({
-      top:200,
+      top:150,
       bottom:300,
       x:550,
       color:'blue'
@@ -314,13 +314,13 @@ function startGame(data) {
     generateWall({
       left:300,
       right:400,
-      y:237,
+      y:212,
       color:'green'
     }),
     generateWall({
-      top:200,
-      bottom:300,
-      x:350,
+      top:125,
+      bottom:325,
+      x:337,
       color:'green'
     })
   ];
@@ -373,14 +373,16 @@ function tick() {
 
   // sort depth layers by reinsertion based on y value
   var combinedArray = characters.concat(projectiles);
+  var player = _.find(characters, {id: localPlayerId});
+
+  var wallsprites = [];
   for (var i = 0; i < walls.length; i++)
   {
-    var wallsprites = _.filter(walls[i].sprites, function () {
-      var player = _.find(characters, {id: localPlayerId})
+     wallsprites = wallsprites.concat(_.filter(walls[i].sprites, function () {
       if (player)
         return walls[i].color != player.color;
       return true;
-    });
+    }));
   }
   var sortedSprites = _.sortBy(combinedArray, function (character) {
     return character.sprite.y;

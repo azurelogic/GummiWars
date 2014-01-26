@@ -55,13 +55,14 @@ block content
               h2 Health:
               h1(data-bind="text: health")
             h1(data-bind="visible: dead") YOU DIED!
-            h2 Score:
-            h1(data-bind="text: points")
+            //h2 Score:
+            //h1(data-bind="text: points")
             button.btn.btn-warning(data-bind="click: returnToRoomList") Return to room list
       #footerContainer.centerText
         br
         h2
-          span Built by Rob Ribeiro
+          div
+            Built by Rob Ribeiro
           br
           span Twitter:&nbsp;
           a(href="http://twitter.com/azurelogic") @azurelogic
