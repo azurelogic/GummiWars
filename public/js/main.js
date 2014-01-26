@@ -159,12 +159,12 @@ function handleImageLoad() {
     images: ["images/blueGummyBear.png","images/greenGummyBear.png","images/redGummyBear.png",
       "images/blueGummieProjectile.png","images/greenGummieProjectile.png","images/redGummieProjectile.png"],
     frames: [
-        [0,0,119,179,0,60,0],
-        [0,0,119,179,1,60,0],
-        [0,0,119,179,2,60,0],
-        [0,0,38,33,3,19,0],
-        [0,0,38,33,4,19,0],
-        [0,0,38,33,5,19,0]
+        [0,0,119,179,0,60,90],
+        [0,0,119,179,1,60,90],
+        [0,0,119,179,2,60,90],
+        [0,0,38,33,3,19,17],
+        [0,0,38,33,4,19,17],
+        [0,0,38,33,5,19,17]
 //      [0, 0, 80, 80, 0, 40, 0],
 //      [80, 0, 80, 80, 0, 40, 0],
 //      [160, 0, 80, 80, 0, 40, 0],
@@ -295,7 +295,10 @@ function tick() {
   // move all of the characters
   for (var i = 0; i < characters.length; i++)
     if (characters[i])
+    {
       characters[i].move(deltaTime);
+      characters[i].detectCollisions();
+    }
 
   // move all of the projectiles
   for (var i = 0; i < projectiles.length; i++)
@@ -333,9 +336,9 @@ function tick() {
     // reset justAttacked flags for all characters
     characters[i].justAttacked = false;
 
-    // remove characters that are out of health or have not been updated
-    if (characters[i].health <= 0 || now - characters[i].lastUpdateTime > 3000)
-      characters[i].die();
+//    // remove characters that are out of health or have not been updated
+//    if (characters[i].health <= 0 || now - characters[i].lastUpdateTime > 3000)
+//      characters[i].die();
   }
 
   // strip the dead from characters array;
@@ -492,7 +495,10 @@ function sendGameDataToServer() {
 
   var newProjectiles = _.filter(projectiles, {justCreated: true, ownerId: localPlayerId});
   for (var i = 0; i < newProjectiles.length; i++)
+  {
     newProjectiles[i].appendDataToMessage(data);
+    newProjectiles[i].justCreated = false;
+  }
 
   //todo need to pack score data on messages
 
@@ -555,7 +561,8 @@ function addNewProjectile(options) {
     y: options.spritey,
     updown: options.updown,
     leftright: options.leftright,
-    color: options.color
+    color: options.color,
+    justCreated: false
   }));
 }
 //

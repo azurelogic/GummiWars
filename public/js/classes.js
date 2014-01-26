@@ -15,9 +15,8 @@ var generatePlayer = function (options) {
   player.characterType = options.characterType;
   player.justAttacked = false;
   player.velocityFactor = .18;
-  player.damageRadius = 60;
+  player.damageRadius = 80;
   player.damageRadiusSquared = player.damageRadius * player.damageRadius;
-  player.damageRating = 50;
   player.health = options.health;
   player.killedBy = null;
   player.stageBoundTrap = false;
@@ -38,7 +37,7 @@ var generatePlayer = function (options) {
       player.sprite.gotoAndPlay(player.getAnimationNameFor('stand'));
   };
 
-  // handles character movement based on current direction vector
+// handles character movement based on current direction vector
   player.move = function (deltaTime) {
     // vertical/horizontal motiion
     if (player.updown == 0 || player.leftright == 0) {
@@ -80,16 +79,16 @@ var generatePlayer = function (options) {
     }
   };
 
-  // assemble the animation name based on character color, animation
-  // type, and current direction
+// assemble the animation name based on character color, animation
+// type, and current direction
   player.getAnimationNameFor = function (animationType) {
     return player.color + animationType;
   };
 
-  // ----- motion handling function section -----
-  // these functions set the direction of motion, direction the
-  // character faces, and the current animation based on which
-  // key is being pressed or released
+// ----- motion handling function section -----
+// these functions set the direction of motion, direction the
+// character faces, and the current animation based on which
+// key is being pressed or released
   player.startLeftMotion = function () {
     player.leftright = -1;
     player.facingLeftright = player.leftright;
@@ -125,7 +124,7 @@ var generatePlayer = function (options) {
     player.updateAnimation();
   };
 
-  // handles collision detection and damage delivery to opposing character type
+// handles collision detection and damage delivery to opposing character type
   player.fireProjectile = function () {
     // start the attack animation
     player.sprite.gotoAndPlay(player.getAnimationNameFor('attack'));
@@ -145,33 +144,44 @@ var generatePlayer = function (options) {
 
   player.detectCollisions = function () {
     //todo change this to find other characters' projectiles
-    // find the local models of the enemy type
-    var opposingForces = []; //_.where(characters, {characterType: enemyType});
+    // find the local models of projectiles that can hurt us
+    var indexOfCurrentColor = _.findIndex(colors, function (color) {
+      return player.color == color;
+    });
 
-    // perform collision detection with all opposing forces
-    for (var i = 0; i < opposingForces.length; i++) {
+    var dangerColor = colors[(indexOfCurrentColor + 1) % colors.length];
+
+    var dangerousProjectiles = _.where(projectiles, function (projectile) {
+      return projectile.color == dangerColor && projectile.ownerId != localPlayerId;
+    });
+
+    // perform collision detection with all dangerous projectiles
+    for (var i = 0; i < dangerousProjectiles.length; i++) {
       // don't bother with detailed collisions if out of damage radius range
-      if (opposingForces[i].sprite.x > player.sprite.x + player.damageRadius ||
-          opposingForces[i].sprite.x < player.sprite.x - player.damageRadius ||
-          opposingForces[i].sprite.y > player.sprite.y + player.damageRadius ||
-          opposingForces[i].sprite.y < player.sprite.y - player.damageRadius)
+      if (dangerousProjectiles[i].sprite.x > player.sprite.x + player.damageRadius ||
+          dangerousProjectiles[i].sprite.x < player.sprite.x - player.damageRadius ||
+          dangerousProjectiles[i].sprite.y > player.sprite.y + player.damageRadius ||
+          dangerousProjectiles[i].sprite.y < player.sprite.y - player.damageRadius)
         continue;
 
       // calculate x and y distances
-      var x = player.sprite.x - opposingForces[i].sprite.x;
-      var y = player.sprite.y - opposingForces[i].sprite.y;
+      var x = player.sprite.x - dangerousProjectiles[i].sprite.x;
+      var y = player.sprite.y - dangerousProjectiles[i].sprite.y;
 
-      // deliver damage if within damage radius and in the correct direction;
-      // this is essentially a semicircle damage area in front of the character
-      // with a little wrap around the back
-      if (x * x + y * y <= player.damageRadiusSquared &&
-          (opposingForces[i].sprite.x - player.sprite.x) * player.facingLeftright >= -10)
-        opposingForces[i].takeDamage(player.damageRating, this);
+      // deliver damage if within damage radius
+      if (x * x + y * y <= player.damageRadiusSquared)
+      //todo change this to do something else
+      {
+        player.takeDamage(20);
+        dangerousProjectiles[i].removeFromActiveProjectiles();
+      }
     }
+
+
   };
 
-  // handle taking damage, marking characters as dead, and
-  // updating viewmodel for local player's health
+// handle taking damage, marking characters as dead, and
+// updating viewmodel for local player's health
   player.takeDamage = function (damageAmount, attacker) {
     // decrement character health
     player.health -= damageAmount;
@@ -222,7 +232,7 @@ var generatePlayer = function (options) {
     //todo switch wall display
   };
 
-  // appends player data to message
+// appends player data to message
   player.appendDataToMessage = function (data) {
     data.chars.push({
       id: player.id,
@@ -239,7 +249,7 @@ var generatePlayer = function (options) {
     player.lastUpdateTime = Date.now();
   };
 
-  // updates local character model based on data in characterData
+// updates local character model based on data in characterData
   player.updateLocalCharacterModel = function (characterData) {
     // update position/direction and health data
     player.sprite.x = characterData.spritex;
@@ -264,7 +274,7 @@ var generatePlayer = function (options) {
     player.updateAnimation();
   };
 
-  // handle player death
+// handle player death
   player.die = function () {
     // add to dead list and mark as dead
     deadCharacterIds.push({id: player.id, time: Date.now()});
@@ -277,11 +287,7 @@ var generatePlayer = function (options) {
       document.onkeyup = null;
       socket.emit('localPlayerDied', {playerId: localPlayerId, roomId: viewModel.currentRoomId()});
     }
-
-    // release the color being used by the player
-    _.find(colors, {color: player.color}).unused = true;
   };
-
 
   // add sprite to the stage
   stage.addChild(player.sprite);
@@ -314,7 +320,6 @@ var generateProjectile = function (options) {
   projectile.updown = options.updown;
   projectile.leftright = options.leftright;
   projectile.color = options.color;
-  //projectile.characterType = options.characterType;
   projectile.velocityFactor = .6;
   projectile.damageRadius = 60;
   projectile.damageRadiusSquared = projectile.damageRadius * projectile.damageRadius;
@@ -324,7 +329,13 @@ var generateProjectile = function (options) {
   projectile.destroyed = false;
   projectile.justCreated = options.justCreated;
 
-  // handles character movement based on current direction vector
+  projectile.removeFromActiveProjectiles = function () {
+    projectiles.splice(_.findIndex(projectiles, function (p) {
+      return projectile.id == p.id;
+    }), 1);
+  };
+
+// handles character movement based on current direction vector
   projectile.move = function (deltaTime) {
     // vertical/horizontal motiion
     if (projectile.updown == 0 || projectile.leftright == 0) {
@@ -344,20 +355,12 @@ var generateProjectile = function (options) {
       projectile.stageBoundTrap = true;
 
     // ensure character doesn't leave the game area if trap variable is set
-    if (projectile.stageBoundTrap) {
-      if (projectile.sprite.x < 60)
-        projectile.sprite.x = 60;
-      else if (projectile.sprite.x > 640)
-        projectile.sprite.x = 640;
-    }
-    if (projectile.sprite.y < 0)
-      projectile.sprite.y = 0;
-    else if (projectile.sprite.y > 320)
-      projectile.sprite.y = 320;
+    if ((projectile.stageBoundTrap && (projectile.sprite.x < 60 || projectile.sprite.x > 640)) ||
+        (projectile.sprite.y < 0) ||
+        (projectile.sprite.y > 320) ||
+        (projectile.sprite.x > 760 || projectile.sprite.x < -60))
+      projectile.removeFromActiveProjectiles();
 
-    // kill weird x-bound escapees
-    if (projectile.sprite.x > 760 || projectile.sprite.x < -60)
-      projectile.destroyed = true;
   };
 
   projectile.appendDataToMessage = function (data) {
@@ -372,7 +375,7 @@ var generateProjectile = function (options) {
     });
   };
 
-  // add sprite to the stage
+// add sprite to the stage
   stage.addChild(projectile.sprite);
   stage.update();
 
@@ -380,8 +383,6 @@ var generateProjectile = function (options) {
 
   return projectile;
 };
-
-
 //// appends zombie damage data to message
 //Zombie.prototype.appendDamagedDataToMessage = function (data) {
 //  data.damaged.push({
