@@ -5,6 +5,13 @@ var KEYCODE_RIGHT = 39;
 var KEYCODE_DOWN = 40;
 var KEYCODE_Z = 90;
 
+var STAGE_HEIGHT = 500;
+var STAGE_WIDTH = 700;
+var STAGE_TOP_Y_BOUND = 30;
+var STAGE_BOTTOM_Y_BOUND = STAGE_HEIGHT-80;
+var STAGE_LEFT_X_BOUND = 60;
+var STAGE_RIGHT_X_BOUND = STAGE_WIDTH-60;
+
 var canvas;
 var stage;
 var background;
@@ -15,6 +22,7 @@ var spritesImage;
 var spriteSheet;
 var characters;
 var projectiles;
+var walls;
 var deadCharacterIds;
 var colors;
 var socket;
@@ -45,6 +53,9 @@ function init() {
   characters = [];
   projectiles = [];
   deadCharacterIds = [];
+  walls = [];
+
+  //todo: initialize wall data
 
   // setup the viewmodel for knockout
   var viewModelMaker = function () {
@@ -159,7 +170,8 @@ function handleImageLoad() {
   var spriteData = {
     images: ["images/blueGummyBear.png","images/greenGummyBear.png","images/redGummyBear.png",
       "images/blueGummieProjectile.png","images/greenGummieProjectile.png","images/redGummieProjectile.png",
-    "images/b1.png", "images/b2.png", "images/g1.png", "images/g2.png", "images/r1.png", "images/r2.png"],
+    "images/b1.png", "images/b2.png", "images/g1.png", "images/g2.png", "images/r1.png", "images/r2.png",
+    "images/wallred.png","images/wallgreen.png","images/wallblue.png"],
     frames: [
         [0,0,119,179,0,60,90], // 0 = blue standing
         [0,0,119,179,1,60,90], // 1 = green standing
@@ -173,40 +185,26 @@ function handleImageLoad() {
         [0,0,119,179,9,60,90], // 9 = green walk 2
         [0,0,119,179,10,60,90], // 10 = red walk 1
         [0,0,119,179,11,60,90], // 11 = red walk 2
-
-//      [0, 0, 80, 80, 0, 40, 0],
-//      [80, 0, 80, 80, 0, 40, 0],
-//      [160, 0, 80, 80, 0, 40, 0],
-//      [240, 0, 80, 80, 0, 40, 0],
-//      [320, 0, 80, 80, 0, 40, 0],
-//      [0, 80, 80, 80, 0, 40, 0],
-//      [80, 80, 80, 80, 0, 40, 0],
-//      [160, 80, 80, 80, 0, 40, 0],
-//      [240, 80, 80, 80, 0, 40, 0],
-//      [320, 80, 80, 80, 0, 40, 0],
-//      [0, 160, 80, 80, 0, 40, 0],
-//      [80, 160, 80, 80, 0, 40, 0],
-//      [160, 160, 80, 80, 0, 40, 0],
-//      [240, 160, 80, 80, 0, 40, 0],
-//      [320, 160, 80, 80, 0, 40, 0]
+        [0,0,25,25,12,0,0], // 12 = red wall
+        [0,0,25,25,13,0,0], // 13 = green wall
+        [0,0,25,25,14,0,0], // 14 = blue wall
     ],
     animations: {
       bluestand: 0,
-      //bluewalk: 0,
       blueattack: 0,
       greenstand: 1,
-//      greenwalk: 1,
       greenattack: 1,
       redstand: 2,
-//      redwalk: 2,
       redattack: 2,
       blueprojectile: 3,
       greenprojectile: 4,
       redprojectile: 5,
-
       bluewalk: { frames: [6, 0, 7, 0], frequency: 8 },
       greenwalk: { frames: [8, 1, 9, 1], frequency: 8 },
-      redwalk: { frames: [10, 2, 11, 2], frequency: 8 }
+      redwalk: { frames: [10, 2, 11, 2], frequency: 8 },
+      redwall: 12,
+      greenwall: 13,
+      bluewall: 14
     }
   };
 
@@ -253,15 +251,79 @@ function startGame(data) {
 
   //todo figure out where to place new players on the stage...
   // instantiate local player
+  var startColor = colors[Math.floor(Math.random() * 3)];
   addNewPlayer({
     id: localPlayerId,
-    spritex: canvas.width / 2,
-    spritey: canvas.height / 2,
+    spritex: Math.floor(Math.random() * (STAGE_RIGHT_X_BOUND - STAGE_LEFT_X_BOUND) + STAGE_LEFT_X_BOUND),
+    spritey: Math.floor(Math.random() * (STAGE_BOTTOM_Y_BOUND - STAGE_TOP_Y_BOUND) + STAGE_TOP_Y_BOUND),
     updown: 0,
     leftright: 0,
     facingLeftright: -1,
-    color: 'red'
+    color: startColor
   });
+
+  switch (startColor) {
+    case 'red':
+      background = backgroundRed;
+      break;
+    case 'green':
+      background = backgroundGreen;
+      break;
+    case 'blue':
+      background = backgroundBlue;
+      break;
+  }
+
+  walls = [
+    generateWall({
+      left:200,
+      right:500,
+      y:150,
+      color:'red'
+    }),
+    generateWall({
+      left:200,
+      right:500,
+      y:350,
+      color:'red'
+    }),
+    generateWall({
+      left:250,
+      right:300,
+      y:237,
+      color:'blue'
+    }),
+    generateWall({
+      left:400,
+      right:450,
+      y:237,
+      color:'blue'
+    }),
+    generateWall({
+      top:200,
+      bottom:300,
+      x:150,
+      color:'blue'
+    }),
+    generateWall({
+      top:200,
+      bottom:300,
+      x:550,
+      color:'blue'
+    }),
+    generateWall({
+      left:300,
+      right:400,
+      y:237,
+      color:'green'
+    }),
+    generateWall({
+      top:200,
+      bottom:300,
+      x:350,
+      color:'green'
+    })
+  ];
 
   // reset viewmodel game state
   viewModel.newGameReset();
@@ -311,6 +373,15 @@ function tick() {
 
   // sort depth layers by reinsertion based on y value
   var combinedArray = characters.concat(projectiles);
+  for (var i = 0; i < walls.length; i++)
+  {
+    var wallsprites = _.filter(walls[i].sprites, function () {
+      var player = _.find(characters, {id: localPlayerId})
+      if (player)
+        return walls[i].color != player.color;
+      return true;
+    });
+  }
   var sortedSprites = _.sortBy(combinedArray, function (character) {
     return character.sprite.y;
   });
@@ -319,6 +390,8 @@ function tick() {
   // reinsert the stage
   stage.addChild(background);
   // reinsert the characters in sorted order
+  for (var i = 0; i < wallsprites.length; i++)
+    stage.addChild(wallsprites[i].sprite);
   for (var i = 0; i < sortedSprites.length; i++)
     stage.addChild(sortedSprites[i].sprite);
 
@@ -341,8 +414,8 @@ function tick() {
     characters[i].justAttacked = false;
 
 //    // remove characters that are out of health or have not been updated
-//    if (characters[i].health <= 0 || now - characters[i].lastUpdateTime > 3000)
-//      characters[i].die();
+    if (characters[i].health <= 0 || now - characters[i].lastUpdateTime > 3000)
+      characters[i].die();
   }
 
   // strip the dead from characters array;

@@ -41,44 +41,44 @@ var generatePlayer = function (options) {
 
 // handles character movement based on current direction vector
   player.move = function (deltaTime) {
+    var newX = player.sprite.x, newY = player.sprite.y;
+    var allowedToMoveX = true;
+    var allowedToMoveY = true;
+
     // vertical/horizontal motiion
     if (player.updown == 0 || player.leftright == 0) {
-      player.sprite.x += player.leftright * deltaTime * player.velocityFactor;
-      player.sprite.y += player.updown * deltaTime * player.velocityFactor;
+      newX += player.leftright * deltaTime * player.velocityFactor;
+      newY += player.updown * deltaTime * player.velocityFactor;
     }
     // diagonal motion
     else {
-      player.sprite.x += player.leftright * deltaTime * player.velocityFactor * 0.70711;
-      player.sprite.y += player.updown * deltaTime * player.velocityFactor * 0.70711;
+      newX += player.leftright * deltaTime * player.velocityFactor * 0.70711;
+      newY += player.updown * deltaTime * player.velocityFactor * 0.70711;
     }
 
-    //todo: fix to match new map bounds
+    // ensure character doesn't leave the game area
+    if ((newX < STAGE_LEFT_X_BOUND) ||
+        (newX > STAGE_RIGHT_X_BOUND))
+      allowedToMoveX = false;
 
-    // set trap variable once a character enters the game area
-    if (!player.stageBoundTrap && (player.sprite.x < 740 && player.sprite.x > 60))
-      player.stageBoundTrap = true;
+    if ((newY < STAGE_TOP_Y_BOUND) ||
+        (newY > STAGE_BOTTOM_Y_BOUND))
+      allowedToMoveY = false;
 
-    // ensure character doesn't leave the game area if trap variable is set
-    if (player.stageBoundTrap) {
-      if (player.sprite.x < 60)
-        player.sprite.x = 60;
-      else if (player.sprite.x > 740)
-        player.sprite.x = 740;
+    for (var i = 0; i < walls.length; i++) {
+      if ((newX > walls[i].left && newX < walls[i].right) && (newY > walls[i].top && newY < walls[i].bottom) && player.color != walls[i].color) {
+        if (player.sprite.x < walls[i].left || player.sprite.x > walls[i].right)
+          allowedToMoveX = false;
+
+        if (player.sprite.y < walls[i].top || player.sprite.y > walls[i].bottom)
+          allowedToMoveY = false;
+      }
     }
-    if (player.sprite.y < 0)
-      player.sprite.y = 0;
-    else if (player.sprite.y > 320)
-      player.sprite.y = 320;
 
-    // kill weird x-bound escapees
-    if (player.sprite.x > 760 || player.sprite.x < -60)
-      player.dead = true;
-
-    // fix remote character animations
-    if (player.localAttackAnimationComplete) {
-      player.updateAnimation();
-      player.localAttackAnimationComplete = false;
-    }
+    if (allowedToMoveX)
+      player.sprite.x = newX;
+    if (allowedToMoveY)
+      player.sprite.y = newY;
   };
 
 // assemble the animation name based on character color, animation
@@ -351,30 +351,45 @@ var generateProjectile = function (options) {
 
 // handles character movement based on current direction vector
   projectile.move = function (deltaTime) {
+    var newX = projectile.sprite.x, newY = projectile.sprite.y;
+    var allowedToMove = true;
+
     // vertical/horizontal motiion
     if (projectile.updown == 0 || projectile.leftright == 0) {
-      projectile.sprite.x += projectile.leftright * deltaTime * projectile.velocityFactor;
-      projectile.sprite.y += projectile.updown * deltaTime * projectile.velocityFactor;
+      newX += projectile.leftright * deltaTime * projectile.velocityFactor;
+      newY += projectile.updown * deltaTime * projectile.velocityFactor;
     }
     // diagonal motion
     else {
-      projectile.sprite.x += projectile.leftright * deltaTime * projectile.velocityFactor * 0.70711;
-      projectile.sprite.y += projectile.updown * deltaTime * projectile.velocityFactor * 0.70711;
+      newX += projectile.leftright * deltaTime * projectile.velocityFactor * 0.70711;
+      newY += projectile.updown * deltaTime * projectile.velocityFactor * 0.70711;
     }
 
-    //todo: fix to match new map bounds
-
-    // set trap variable once a character enters the game area
-    if (!projectile.stageBoundTrap && (projectile.sprite.x < 640 && projectile.sprite.x > 60))
-      projectile.stageBoundTrap = true;
-
-    // ensure character doesn't leave the game area if trap variable is set
-    if ((projectile.stageBoundTrap && (projectile.sprite.x < 60 || projectile.sprite.x > 640)) ||
-        (projectile.sprite.y < 0) ||
-        (projectile.sprite.y > 320) ||
-        (projectile.sprite.x > 760 || projectile.sprite.x < -60))
+    // ensure character doesn't leave the game area
+    if ((newX < STAGE_LEFT_X_BOUND) ||
+        (newX > STAGE_RIGHT_X_BOUND) ||
+        (newY < STAGE_TOP_Y_BOUND) ||
+        (newY > STAGE_BOTTOM_Y_BOUND))
+    {
       projectile.removeFromActiveProjectiles();
+      allowedToMove = false;
+    }
 
+    for (var i = 0; i < walls.length; i++) {
+      if ((newX > walls[i].left && newX < walls[i].right) && (newY > walls[i].top && newY < walls[i].bottom) && projectile.color != walls[i].color) {
+        if ((projectile.sprite.x < walls[i].left || projectile.sprite.x > walls[i].right) || (projectile.sprite.y < walls[i].top || projectile.sprite.y > walls[i].bottom))
+        {
+          projectile.removeFromActiveProjectiles();
+          allowedToMove = false;
+        }
+      }
+    }
+
+    if (allowedToMove)
+    {
+      projectile.sprite.x = newX;
+      projectile.sprite.y = newY;
+    }
   };
 
   projectile.appendDataToMessage = function (data) {
@@ -397,6 +412,49 @@ var generateProjectile = function (options) {
 
   return projectile;
 };
+
+var generateWall = function (options) {
+  var wall = {};
+  var direction;
+
+  wall.color = options.color;
+
+  if (options.top && options.bottom && options.x) {
+    wall.top = options.top;
+    wall.bottom = options.bottom;
+    wall.left = options.x;
+    wall.right = options.x + 25;
+    direction = 'vertical';
+  }
+  else if (options.left && options.right && options.y) {
+    wall.top = options.y;
+    wall.bottom = options.y + 25;
+    wall.left = options.left;
+    wall.right = options.right;
+    direction = 'horizontal';
+  }
+
+  wall.sprites = [];
+
+  for (var i = 0; i < (options.bottom - options.top) / 25; i++) {
+    var wallPiece = {};
+    wallPiece.sprite = new createjs.BitmapAnimation(spriteSheet);
+
+    wallPiece.sprite.x = wall.left;
+    wallPiece.sprite.y = wall.top + i * 25;
+
+    // add sprite to the stage
+    stage.addChild(wallPiece.sprite);
+    stage.update();
+
+    wallPiece.sprite.gotoAndPlay(wall.color + 'wall');
+
+    wall.sprites.push(wallPiece);
+  }
+
+  return wall;
+};
+
 //// appends zombie damage data to message
 //Zombie.prototype.appendDamagedDataToMessage = function (data) {
 //  data.damaged.push({
