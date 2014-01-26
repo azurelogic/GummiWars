@@ -120,9 +120,9 @@ function init() {
   socket.emit('playerConnect');
 
   // load background
-  backgroundRed = new createjs.Bitmap("/images/redGummyBear.png");
-  backgroundGreen = new createjs.Bitmap("/images/greenGummyBear.png");
-  backgroundBlue = new createjs.Bitmap("/images/blueGummyBear.png");
+  backgroundRed = new createjs.Bitmap("/images/gummyarenared.png");
+  backgroundGreen = new createjs.Bitmap("/images/gummyarenagreen.png");
+  backgroundBlue = new createjs.Bitmap("/images/gummyarenablue.png");
 
   // load sprite sheet
   spritesImage = new Image();
