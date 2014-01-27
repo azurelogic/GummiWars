@@ -25,13 +25,14 @@ block content
         #roomContainer.centerText(data-bind="visible: !gameStarted()")
           h2 Click on a room below to join the action
           #roomList(data-bind="foreach: rooms")
-            button.btn.btn-lg.btn-success.room(data-bind="click: $root.joinRoom")
-              .roomId
-                span Room ID:
-                span(data-bind="text: roomId")
-              .playerCount
-                span # of players:
-                span(data-bind="text: playerCount")
+            .room
+              button.btn.btn-lg.btn-success(data-bind="click: $root.joinRoom")
+                .roomId
+                  span Room ID:
+                  span(data-bind="text: roomId")
+                .playerCount
+                  span # of players:
+                  span(data-bind="text: playerCount")
         #roomData(data-bind="visible: !gameStarted()")
           #totalRooms
             h2 Total # of rooms:&nbsp;
@@ -73,7 +74,7 @@ block content
       #footerContainer.centerText
         br
         h2
-          div Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch, Andrew Barker
+          div Concept by Rob Ribeiro, Eric Souther, Ronald Pulliam, Mark Schroder, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch, Andrew Barker
           br
           span Rob on Twitter:&nbsp;
           a(href="http://twitter.com/azurelogic") @azurelogic
