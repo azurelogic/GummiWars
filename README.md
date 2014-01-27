@@ -21,7 +21,7 @@ to run locally:
 
 Global Game Jam 2014 South Bend
 
-Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch, Andrew Barker
+Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Ronald Pulliam, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch, Andrew Barker
 
 Engine based on Retro Roman Zombie Apocalypse
 
