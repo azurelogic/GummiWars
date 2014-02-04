@@ -12,47 +12,49 @@ block scripts
   //-script(type="text/javascript",src="//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js")
   //-script(type="text/javascript",src="/js/knockout-2.2.1.js")
   script(type="text/javascript",src="/js/uuid.js")
-  script(type="text/javascript",src="/js/classes.js")
-  script(type="text/javascript",src="/js/main.js")
+  script(type="text/javascript",src="/js/gummiwarsclasses.js")
+  script(type="text/javascript",src="/js/gummiwarsmain.js")
+  script.
+    document.addEventListener('DOMContentLoaded', init);
 
 
 block content
-  body(onload="init();")
+  body
     #mainContainer
       #headerContainer.centerText
         h1 GummiWars for Global Game Jam 2014
       #contentContainer.clearfix
-        #roomContainer.centerText(data-bind="visible: !gameStarted()")
-          h2 Click on a room below to join the action
-          #roomList(data-bind="foreach: rooms")
-            .room
-              button.btn.btn-lg.btn-success(data-bind="click: $root.joinRoom")
+        #roomContainer(data-bind="visible: !gameStarted()")
+          #roomListContainer.centerText
+            h2 Click on a room below to join the action
+            #roomData
+              button.btn.btn-primary(data-bind="click: $root.getRoomUpdate") Refresh Rooms
+              #totalRooms
+                h2 Total # of rooms:&nbsp;
+                  span(data-bind="text: totalRooms")
+              #availableRooms
+                h2 # of rooms available:&nbsp;
+                  span(data-bind="text: rooms().length")
+              #playersInRooms
+                h2 # of players in game:&nbsp;
+                  span(data-bind="text: playersInRooms")
+              br
+              h3 How to play:
+              h3 Arrow Keys: Move your gummy
+              h3 Spacebar: ATTACK!!!
+              h3 Z: Change color
+              h3 Red hurts Blue
+              h3 Blue hurts Green
+              h3 Green hurts Red
+              br
+            #roomList(data-bind="foreach: rooms")
+              button.btn.btn-lg.btn-success.room(data-bind="click: $root.joinRoom")
                 .roomId
                   span Room ID:
                   span(data-bind="text: roomId")
                 .playerCount
                   span # of players:
                   span(data-bind="text: playerCount")
-        #roomData(data-bind="visible: !gameStarted()")
-          #totalRooms
-            h2 Total # of rooms:&nbsp;
-              span(data-bind="text: totalRooms")
-          #availableRooms
-            h2 # of rooms available:&nbsp;
-              span(data-bind="text: rooms().length")
-          #playersInRooms
-            h2 # of players in game:&nbsp;
-              span(data-bind="text: playersInRooms")
-          br
-          h2 How to play:
-          h2 Arrow Keys: Move your gummy
-          h2 Spacebar: ATTACK!!!
-          h2 Z: Change color
-          h2 Red hurts Blue
-          h2 Blue hurts Green
-          h2 Green hurts Red
-          br
-          button.btn.btn-primary(data-bind="click: $root.getRoomUpdate") Refresh Rooms
         #gameContainer(data-bind="visible: gameStarted")
           canvas#gameCanvas(width=700,height=500) no canvas support
           #gameData
@@ -61,15 +63,13 @@ block content
               h1(data-bind="text: health")
             h1(data-bind="visible: dead") YOU DIED!
             br
-            h2 How to play:
-            h2 Arrow Keys: Move your gummy
-            h2 Spacebar: ATTACK!!!
-            h2 Z: Change color
-            h2 Red hurts Blue
-            h2 Blue hurts Green
-            h2 Green hurts Red
-            //h2 Score:
-            //h1(data-bind="text: points")
+            h3 How to play:
+            h3 Arrow Keys: Move your gummy
+            h3 Spacebar: ATTACK!!!
+            h3 Z: Change color
+            h3 Red hurts Blue
+            h3 Blue hurts Green
+            h3 Green hurts Red
             button.btn.btn-warning(data-bind="click: returnToRoomList") Return to room list
       #footerContainer.centerText
         br

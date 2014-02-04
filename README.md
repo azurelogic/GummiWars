@@ -25,4 +25,6 @@ Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Ronald Pulliam, Steven Schn
 
 Engine based on Retro Roman Zombie Apocalypse
 
+This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US).
+
 

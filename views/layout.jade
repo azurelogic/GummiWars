@@ -2,10 +2,8 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    block scripts
-    script
+
+    script.
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-40456655-1']);
       _gaq.push(['_trackPageview']);
@@ -16,3 +14,6 @@ html
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
   block content
+  link(rel='stylesheet', href='//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css')
+  link(rel='stylesheet', href='/stylesheets/style.css')
+  block scripts

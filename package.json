@@ -1,16 +1,15 @@
 {
   "name": "GummiWars",
-  "version": "0.1",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node app"
   },
   "dependencies": {
-    "jade": "*",
-    "less-middleware": "*",
-    "mongoose": "*",
-    "express.io": "*",
-    "node-uuid": "*",
-    "lodash": "*"
+    "jade": "1.1.5",
+    "less-middleware": "0.1.15",
+    "express.io": "1.1.13",
+    "node-uuid": "1.4.1",
+    "lodash": "2.4.1"
   }
 }
