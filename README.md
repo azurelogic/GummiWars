@@ -23,7 +23,7 @@ Global Game Jam 2014 South Bend
 
 Concept by Rob Ribeiro, Eric Souther, Mark Schroder, Ronald Pulliam, Steven Schneider, Robert Thompson, Doug Harsch, Beth Harsch, Jake Harsch, Andrew Barker
 
-Engine based on Retro Roman Zombie Apocalypse
+Engine based on [Retro Roman Zombie Apocalypse](https://github.com/azurelogic/RetroRomanZombieApocalypse)
 
 This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US).
 
