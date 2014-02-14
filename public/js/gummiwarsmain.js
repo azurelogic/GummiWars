@@ -118,7 +118,7 @@ function init() {
   ko.applyBindings(viewModel);
 
   // connect to server
-  socket = io.connect();
+  socket = io.connect(location.protocol + '//' + location.host, {path: 'sockets/gummiwars'});
 
   // register callbacks for server messages
   socket.on('connectionReply', loadRoomsAndMyId);
